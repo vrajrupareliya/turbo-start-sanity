@@ -29,9 +29,9 @@ function NavigationMenu({
         <NavMenuPrimitive.Portal>
           <NavMenuPrimitive.Positioner
             align="center"
-            className="isolate z-50 h-(--positioner-height) w-(--positioner-width) max-w-(--available-width) transition-[top,left,right,bottom] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] before:absolute before:inset-x-0 before:-top-2 before:h-2 before:content-[''] data-instant:transition-none"
+            className="isolate z-50 h-(--positioner-height) w-(--positioner-width) max-w-(--available-width) transition-[top,left,right,bottom] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] before:absolute before:inset-x-0 before:-top-6 before:h-6 before:content-[''] data-instant:transition-none"
             collisionPadding={16}
-            sideOffset={0}
+            sideOffset={22}
           >
             <NavMenuPrimitive.Popup className="relative h-(--popup-height) w-(--popup-width) origin-(--transform-origin) overflow-hidden border bg-popover text-popover-foreground shadow-sm outline-none transition-[opacity,transform,width,height,scale,translate] duration-[0.35s] ease-[cubic-bezier(0.22,1,0.36,1)] data-ending-style:scale-95 data-starting-style:scale-95 data-ending-style:opacity-0 data-starting-style:opacity-0 data-ending-style:duration-150">
               <NavMenuPrimitive.Viewport
@@ -68,7 +68,7 @@ function NavigationMenuItem({
 }: React.ComponentProps<typeof NavMenuPrimitive.Item>) {
   return (
     <NavMenuPrimitive.Item
-      className={cn("relative flex h-full", className)}
+      className={cn("relative flex h-full items-center", className)}
       data-slot="navigation-menu-item"
       {...props}
     />

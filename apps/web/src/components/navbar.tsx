@@ -96,8 +96,13 @@ export function Navbar({
             )}
           </div>
 
-          <NavigationMenu aria-label="Main" className="hidden lg:flex" viewport>
-            <NavigationMenuList className="gap-1">
+          <NavigationMenu
+            aria-label="Main"
+            className="hidden lg:flex"
+            closeDelay={150}
+            viewport
+          >
+            <NavigationMenuList>
               {columns?.map((column) => {
                 if (column.type === "column") {
                   return (
@@ -145,7 +150,7 @@ export function Navbar({
                   return (
                     <NavigationMenuItem key={column._key}>
                       <NavigationMenuLink
-                        className="flex h-full items-center rounded-md px-3 py-2 font-medium text-muted-foreground text-sm transition-colors hover:text-foreground"
+                        className="flex h-auto items-center rounded-md px-3 py-2 font-medium text-muted-foreground text-sm transition-colors hover:text-foreground"
                         render={<Link href={column.href} />}
                       >
                         {column.name}
