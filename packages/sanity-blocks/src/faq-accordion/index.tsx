@@ -70,14 +70,14 @@ export function FaqAccordion({
                   name={`faq-${_key}`}
                   open={itemId === defaultOpenId}
                 >
-                  <summary className="flex cursor-default list-none items-start justify-between gap-4 rounded-md py-2 outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50 [&::-webkit-details-marker]:hidden">
+                  <summary className="flex cursor-default list-none items-start justify-between gap-4 rounded-md px-3 py-2 outline-hidden focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background [&::-webkit-details-marker]:hidden">
                     <h3 className="font-medium text-[15px] leading-6">
                       {faq.title}
                     </h3>
                     <ChevronDownIcon className="pointer-events-none mt-0.5 size-4 shrink-0 text-muted-foreground transition-transform duration-200 group-open:rotate-180" />
                   </summary>
                   {faq.richText?.length ? (
-                    <div className="pb-2 text-muted-foreground">
+                    <div className="px-3 pb-2 text-muted-foreground">
                       <RichText
                         className="text-sm md:text-base"
                         richText={faq.richText}

@@ -76,7 +76,7 @@ function NavigationMenuItem({
 }
 
 const navigationMenuTriggerStyle = cva(
-  "group inline-flex h-full w-max items-center justify-center rounded-md bg-background px-5 py-2 font-medium text-sm transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-primary disabled:pointer-events-none disabled:opacity-50 data-popup-open:bg-accent/50"
+  "group inline-flex h-full w-max items-center justify-center rounded-md bg-background px-5 py-2 font-medium text-sm transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground outline-hidden focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:pointer-events-none disabled:opacity-50 data-popup-open:bg-accent/50"
 );
 
 function NavigationMenuTrigger({
@@ -122,7 +122,7 @@ function NavigationMenuLink({
   return (
     <NavMenuPrimitive.Link
       className={cn(
-        "flex h-full focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-primary",
+        "flex h-full outline-hidden focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background",
         className
       )}
       data-slot="navigation-menu-link"
