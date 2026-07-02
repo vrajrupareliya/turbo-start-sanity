@@ -30,7 +30,7 @@ import { MenuLink } from "./elements/menu-link";
 import { Logo } from "./logo";
 
 const FOCUS_RING =
-  "outline-hidden focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background";
+  "outline-hidden focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-inset";
 
 const TABLET_QUERY = "(min-width: 768px) and (max-width: 1024px)";
 
