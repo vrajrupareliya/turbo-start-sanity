@@ -92,6 +92,7 @@ function SocialLinks({ data }: SocialLinksProps) {
         >
           <Link
             aria-label={label}
+            className="inline-block rounded-md outline-hidden focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background"
             href={url ?? "#"}
             prefetch={false}
             rel="noopener noreferrer"
@@ -193,6 +194,7 @@ function Footer({ data, settingsData }: FooterProps) {
                             key={`${link?._key}-${columnIndex}-column-${column?._key}`}
                           >
                             <Link
+                              className="rounded-sm outline-hidden focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background"
                               href={link.href ?? "#"}
                               rel={
                                 link.openInNewTab
@@ -219,10 +221,20 @@ function Footer({ data, settingsData }: FooterProps) {
               </p>
               <ul className="flex justify-center gap-4 lg:justify-start">
                 <li className="hover:text-primary">
-                  <Link href="/terms">Terms and Conditions</Link>
+                  <Link
+                    className="rounded-sm outline-hidden focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+                    href="/terms"
+                  >
+                    Terms and Conditions
+                  </Link>
                 </li>
                 <li className="hover:text-primary">
-                  <Link href="/privacy">Privacy Policy</Link>
+                  <Link
+                    className="rounded-sm outline-hidden focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+                    href="/privacy"
+                  >
+                    Privacy Policy
+                  </Link>
                 </li>
               </ul>
             </div>
