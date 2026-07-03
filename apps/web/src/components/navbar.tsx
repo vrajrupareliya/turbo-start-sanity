@@ -111,11 +111,11 @@ export function Navbar({
                         {column.title}
                       </NavigationMenuTrigger>
                       <NavigationMenuContent>
-                        <ul className="grid w-[320px] gap-1 p-2">
+                        <ul className="grid w-[320px] gap-1 p-1">
                           {column.links?.map((link: ColumnLink) => (
                             <li key={link._key}>
                               <NavigationMenuLink
-                                className="group flex items-start gap-3 rounded-lg p-3 transition-colors hover:bg-accent"
+                                className="group flex items-start gap-3 rounded-sm p-3 transition-colors hover:bg-accent"
                                 closeOnClick
                                 render={<Link href={link.href ?? "#"} />}
                               >
