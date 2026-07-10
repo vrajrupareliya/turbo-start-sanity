@@ -1,4 +1,8 @@
-import { defineBlueprint, defineDocumentFunction } from "@sanity/blueprints";
+import {
+  defineBlueprint,
+  defineDocumentFunction,
+  defineSyncTagInvalidateFunction,
+} from "@sanity/blueprints";
 
 export default defineBlueprint({
   resources: [
@@ -13,6 +17,10 @@ export default defineBlueprint({
         projection:
           "{'beforeSlug': before().slug.current, 'slug': after().slug.current}",
       },
+    }),
+    defineSyncTagInvalidateFunction({
+      name: "invalidate-tags",
+      src: "./functions/invalidate-tags",
     }),
   ],
 });
