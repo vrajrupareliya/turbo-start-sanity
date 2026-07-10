@@ -56,9 +56,27 @@ export interface MarkdownOptions {
    * their alt/caption text rather than emitting broken `![]()` markup.
    */
   resolveImageUrl?: (image: MarkdownImage) => string | null | undefined;
+  /**
+   * Site origin (e.g. `https://example.com`) used to make root-relative internal
+   * links absolute, so `.md` output is self-contained. Omitted → links stay relative.
+   */
+  baseUrl?: string;
 }
 
 export type PortableTextValue = PortableTextNode[] | null | undefined;
+
+// Prefix a root-relative path (`/about`) with `baseUrl`. Absolute, `//`, `#`,
+// and scheme links (`mailto:`) pass through; no-op without `baseUrl`.
+export function absolutizeUrl(
+  href: string | null | undefined,
+  baseUrl: string | null | undefined
+): string {
+  const url = (href ?? "").trim();
+  if (!(url && baseUrl) || !url.startsWith("/") || url.startsWith("//")) {
+    return url;
+  }
+  return `${baseUrl.replace(/\/+$/, "")}${url}`;
+}
 
 // Format a URL for a Markdown link/image target. Spaces or parens would close
 // the `(...)` early, so wrap those in CommonMark's angle-bracket form.
@@ -130,7 +148,7 @@ export function portableTextToMarkdown(
         if (!href || href === "#") {
           return children;
         }
-        return `[${children}](${formatUrl(href)})`;
+        return `[${children}](${formatUrl(absolutizeUrl(href, options.baseUrl))})`;
       },
       // Use CommonMark-compliant fencing (handles embedded backticks).
       code: ({ children }) => wrapInlineCode(children),
