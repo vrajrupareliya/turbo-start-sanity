@@ -1,9 +1,9 @@
 import {
-  type MarkdownBlock,
-  type MarkdownOptions,
   eyebrowToMarkdown,
   headingToMarkdown,
   joinSections,
+  type MarkdownBlock,
+  type MarkdownOptions,
   mdLink,
 } from "../internal/markdown";
 import {
@@ -26,7 +26,7 @@ export function faqAccordionToMarkdown(
 
   const link = block.link;
   const linkLabel = (link?.description || link?.title || "").trim();
-  const linkMarkdown = linkLabel ? mdLink(linkLabel, link?.href) : "";
+  const linkMarkdown = linkLabel ? mdLink(linkLabel, link?.href, options) : "";
 
   const subtitle = (block.subtitle ?? "").trim();
 
