@@ -25,6 +25,7 @@ export const handler = syncTagInvalidateEventHandler(
         Authorization: `Bearer ${SECRET}`,
       },
       body: JSON.stringify({ syncTags }),
+      signal: AbortSignal.timeout(10_000),
     });
 
     if (!res.ok) {
