@@ -1,8 +1,12 @@
+import "dotenv/config";
 import {
   defineBlueprint,
   defineDocumentFunction,
   defineSyncTagInvalidateFunction,
 } from "@sanity/blueprints";
+
+const projectId = process.env.SANITY_STUDIO_PROJECT_ID ?? "";
+const dataset = process.env.SANITY_STUDIO_DATASET ?? "production";
 
 export default defineBlueprint({
   resources: [
@@ -21,6 +25,10 @@ export default defineBlueprint({
     defineSyncTagInvalidateFunction({
       name: "invalidate-tags",
       src: "./functions/invalidate-tags",
+      // Scope to this dataset so non-prod publishes don't purge prod cache.
+      event: {
+        resource: { type: "dataset", id: `${projectId}.${dataset}` },
+      },
     }),
   ],
 });
