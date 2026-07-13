@@ -108,6 +108,22 @@ test("custom links with an unsafe scheme drop to an empty target", () => {
   expect(md).toBe("[click me]()");
 });
 
+test("unsafe scheme with embedded control chars is still blocked", () => {
+  const md = portableTextToMarkdown([
+    {
+      _type: "block",
+      style: "normal",
+      markDefs: [
+        { _key: "l", _type: "customLink", href: "java\nscript:alert(1)" },
+      ],
+      children: [{ _type: "span", text: "click me", marks: ["l"] }],
+    },
+  ]);
+
+  // Browsers ignore the newline, so `java\nscript:` resolves to `javascript:`.
+  expect(md).toBe("[click me]()");
+});
+
 test("nests bullet and numbered lists and keeps them grouped", () => {
   const md = portableTextToMarkdown([
     {

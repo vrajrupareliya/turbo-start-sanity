@@ -90,7 +90,10 @@ const UNSAFE_URL_SCHEME = /^\s*(?:javascript|vbscript|data):/i;
 // the `(...)` early, so wrap those in CommonMark's angle-bracket form. Unsafe
 // schemes return an empty target.
 export function formatUrl(href: string | null | undefined): string {
-  const url = (href ?? "").trim();
+  // Strip ASCII control chars (browsers ignore them) so `java\nscript:` can't
+  // slip past the scheme check.
+  // biome-ignore lint/suspicious/noControlCharactersInRegex: intentional — stripping them is the fix
+  const url = (href ?? "").replace(/[\u0000-\u001F]/g, "").trim();
   if (!url || UNSAFE_URL_SCHEME.test(url)) {
     return "";
   }
