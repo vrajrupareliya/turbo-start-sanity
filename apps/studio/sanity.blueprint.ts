@@ -5,7 +5,12 @@ import {
   defineSyncTagInvalidateFunction,
 } from "@sanity/blueprints";
 
-const projectId = process.env.SANITY_STUDIO_PROJECT_ID ?? "";
+const projectId = process.env.SANITY_STUDIO_PROJECT_ID;
+if (!projectId) {
+  throw new Error(
+    "SANITY_STUDIO_PROJECT_ID must be set to deploy the blueprint"
+  );
+}
 const dataset = process.env.SANITY_STUDIO_DATASET ?? "production";
 
 export default defineBlueprint({
