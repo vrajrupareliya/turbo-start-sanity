@@ -14,12 +14,15 @@ export const handler = syncTagInvalidateEventHandler(
     if (!SITE_URL) {
       throw new Error("NEXT_PUBLIC_SITE_URL is not configured");
     }
+    if (!SECRET) {
+      throw new Error("SANITY_REVALIDATE_SECRET is not configured");
+    }
 
     const res = await fetch(`${SITE_URL}/api/revalidate-sync-tags`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${SECRET ?? ""}`,
+        Authorization: `Bearer ${SECRET}`,
       },
       body: JSON.stringify({ syncTags }),
     });

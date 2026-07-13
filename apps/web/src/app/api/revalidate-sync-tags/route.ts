@@ -1,12 +1,23 @@
+import { timingSafeEqual } from "node:crypto";
 import { env } from "@workspace/env/server";
 import { revalidateTag } from "next/cache";
 import { type NextRequest, NextResponse } from "next/server";
 
+// Cap the tag count so a caller can't force an unbounded revalidate loop.
+const MAX_TAGS = 1000;
+
+// Constant-time secret comparison; length-guarded so buffers match.
+function secretsMatch(provided: string, expected: string): boolean {
+  const a = Buffer.from(provided);
+  const b = Buffer.from(expected);
+  return a.length === b.length && timingSafeEqual(a, b);
+}
+
 export async function POST(req: NextRequest) {
   const expected = env.SANITY_REVALIDATE_SECRET;
   const secret = req.headers.get("authorization")?.replace("Bearer ", "");
-  // Fail closed: reject when the secret is unset (undefined === undefined).
-  if (!expected || secret !== expected) {
+  // Fail closed: reject when the shared secret is unset or doesn't match.
+  if (!(expected && secret) || !secretsMatch(secret, expected)) {
     return new Response("Unauthorized", { status: 401 });
   }
 
@@ -20,13 +31,19 @@ export async function POST(req: NextRequest) {
   }
 
   const syncTags: unknown = (body as { syncTags?: unknown })?.syncTags;
-  if (!Array.isArray(syncTags) || syncTags.length === 0) {
-    return new Response("Bad Request: syncTags must be a non-empty array", {
-      status: 400,
-    });
+  if (
+    !Array.isArray(syncTags) ||
+    syncTags.length === 0 ||
+    syncTags.length > MAX_TAGS ||
+    !syncTags.every((tag): tag is string => typeof tag === "string")
+  ) {
+    return new Response(
+      "Bad Request: syncTags must be a non-empty array of strings",
+      { status: 400 }
+    );
   }
 
-  for (const tag of syncTags as string[]) {
+  for (const tag of syncTags) {
     // `sanityFetch` tags entries as `sanity:${tag}`; `{ expire: 0 }` = no stale window.
     revalidateTag(`sanity:${tag}`, { expire: 0 });
   }
