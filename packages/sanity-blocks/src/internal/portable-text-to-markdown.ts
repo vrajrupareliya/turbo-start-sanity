@@ -75,14 +75,23 @@ export function absolutizeUrl(
   if (!(url && baseUrl) || !url.startsWith("/") || url.startsWith("//")) {
     return url;
   }
-  return `${baseUrl.replace(/\/+$/, "")}${url}`;
+  // Strip trailing slashes (loop, not a ReDoS-prone regex).
+  let base = baseUrl;
+  while (base.endsWith("/")) {
+    base = base.slice(0, -1);
+  }
+  return `${base}${url}`;
 }
 
+// Script-executing schemes dropped so a link href can't smuggle XSS.
+const UNSAFE_URL_SCHEME = /^\s*(?:javascript|vbscript|data):/i;
+
 // Format a URL for a Markdown link/image target. Spaces or parens would close
-// the `(...)` early, so wrap those in CommonMark's angle-bracket form.
+// the `(...)` early, so wrap those in CommonMark's angle-bracket form. Unsafe
+// schemes return an empty target.
 export function formatUrl(href: string | null | undefined): string {
   const url = (href ?? "").trim();
-  if (!url) {
+  if (!url || UNSAFE_URL_SCHEME.test(url)) {
     return "";
   }
   return /[\s()]/.test(url) ? `<${url}>` : url;

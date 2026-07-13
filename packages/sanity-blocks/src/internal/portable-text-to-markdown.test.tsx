@@ -91,6 +91,23 @@ test("custom links become absolute when baseUrl is provided", () => {
   expect(md).toBe("[a link](https://example.com/features)");
 });
 
+test("custom links with an unsafe scheme drop to an empty target", () => {
+  const md = portableTextToMarkdown([
+    {
+      _type: "block",
+      style: "normal",
+      markDefs: [
+        { _key: "l", _type: "customLink", href: "javascript:alert(1)" },
+      ],
+      children: [{ _type: "span", text: "click me", marks: ["l"] }],
+    },
+  ]);
+
+  // The `javascript:` scheme is stripped by formatUrl, so no executable target
+  // is emitted.
+  expect(md).toBe("[click me]()");
+});
+
 test("nests bullet and numbered lists and keeps them grouped", () => {
   const md = portableTextToMarkdown([
     {
