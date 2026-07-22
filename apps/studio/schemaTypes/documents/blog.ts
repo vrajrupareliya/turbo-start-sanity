@@ -54,6 +54,20 @@ export const blog = defineType({
       group: GROUP.MAIN_CONTENT,
     }),
     defineField({
+      name: "category",
+      title: "Category",
+      type: "reference",
+      description:
+        "Choose the topic this blog post belongs to so readers can filter related articles",
+      to: [{ type: "category" }],
+      options: {
+        disableNew: false,
+      },
+      validation: (Rule) =>
+        Rule.required().error("A blog category is required"),
+      group: GROUP.MAIN_CONTENT,
+    }),
+    defineField({
       name: "authors",
       type: "array",
       title: "Authors",
@@ -116,6 +130,7 @@ export const blog = defineType({
       isHidden: "seoHideFromLists",
       slug: "slug.current",
       author: "authors.0.name",
+      category: "category.title",
       publishDate: "publishedAt",
     },
     prepare: ({
@@ -124,6 +139,7 @@ export const blog = defineType({
       isPrivate,
       isHidden,
       author,
+      category,
       slug,
       publishDate,
     }) => {
@@ -144,7 +160,7 @@ export const blog = defineType({
       return {
         title: title || "Untitled Blog",
         media,
-        subtitle: `🔗 ${slug} | ${visibility} | ${authorInfo} | ${dateInfo}`,
+        subtitle: `🔗 ${slug} | ${visibility} | ${category || "No category"} | ${authorInfo} | ${dateInfo}`,
       };
     },
   },

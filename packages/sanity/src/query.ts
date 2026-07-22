@@ -76,6 +76,16 @@ const blogAuthorFragment = /* groq */ `
   }
 `;
 
+const blogCategoryFragment = /* groq */ `
+  category->{
+    _id,
+    title,
+    "slug": slug.current,
+    color,
+    icon
+  }
+`;
+
 const blogCardFragment = /* groq */ `
   _type,
   _id,
@@ -85,6 +95,7 @@ const blogCardFragment = /* groq */ `
   orderRank,
   ${imageFragment},
   publishedAt,
+  ${blogCategoryFragment},
   ${blogAuthorFragment}
 `;
 
@@ -174,8 +185,20 @@ export const queryBlogIndexPageBlogs = defineQuery(`
   }
 `);
 
+export const queryBlogCategoryBlogs = defineQuery(`
+  *[_type == "blog" && category._ref == $categoryId && (seoHideFromLists != true)] | order(orderRank asc) [$start...$end]{
+    ${blogCardFragment}
+  }
+`);
+
 export const queryAllBlogDataForSearch = defineQuery(`
   *[_type == "blog" && defined(slug.current) && (seoHideFromLists != true)]{
+    ${blogCardFragment}
+  }
+`);
+
+export const queryBlogCategoryDataForSearch = defineQuery(`
+  *[_type == "blog" && category._ref == $categoryId && defined(slug.current) && (seoHideFromLists != true)]{
     ${blogCardFragment}
   }
 `);
@@ -183,10 +206,75 @@ export const queryAllBlogDataForSearch = defineQuery(`
 export const queryBlogIndexPageBlogsCount = defineQuery(`
   count(*[_type == "blog" && (seoHideFromLists != true)])
 `);
+
+export const queryBlogCategoryBlogsCount = defineQuery(`
+  count(*[_type == "blog" && category._ref == $categoryId && (seoHideFromLists != true)])
+`);
+
+export const queryBlogCategories = defineQuery(`
+  *[_type == "category" && defined(slug.current)] | order(title asc){
+    _id,
+    title,
+    "slug": slug.current,
+    description,
+    color,
+    icon,
+    "postCount": count(*[_type == "blog" && category._ref == ^._id && (seoHideFromLists != true)])
+  }
+`);
+
+export const queryBlogCategoryBySlug = defineQuery(`
+  *[_type == "category" && slug.current == $slug][0]{
+    _id,
+    title,
+    "slug": slug.current,
+    description,
+    color,
+    icon
+  }
+`);
+
+export const queryBlogIndexPageBlogsLatest = defineQuery(`
+  *[_type == "blog" && (seoHideFromLists != true)] | order(publishedAt desc) [$start...$end]{
+    ${blogCardFragment}
+  }
+`);
+
+export const queryBlogIndexPageBlogsOldest = defineQuery(`
+  *[_type == "blog" && (seoHideFromLists != true)] | order(publishedAt asc) [$start...$end]{
+    ${blogCardFragment}
+  }
+`);
+
+export const queryBlogIndexPageBlogsTitleAsc = defineQuery(`
+  *[_type == "blog" && (seoHideFromLists != true)] | order(title asc) [$start...$end]{
+    ${blogCardFragment}
+  }
+`);
+
+export const queryBlogCategoryBlogsLatest = defineQuery(`
+  *[_type == "blog" && category._ref == $categoryId && (seoHideFromLists != true)] | order(publishedAt desc) [$start...$end]{
+    ${blogCardFragment}
+  }
+`);
+
+export const queryBlogCategoryBlogsOldest = defineQuery(`
+  *[_type == "blog" && category._ref == $categoryId && (seoHideFromLists != true)] | order(publishedAt asc) [$start...$end]{
+    ${blogCardFragment}
+  }
+`);
+
+export const queryBlogCategoryBlogsTitleAsc = defineQuery(`
+  *[_type == "blog" && category._ref == $categoryId && (seoHideFromLists != true)] | order(title asc) [$start...$end]{
+    ${blogCardFragment}
+  }
+`);
+
 export const queryBlogSlugPageData = defineQuery(`
   *[_type == "blog" && slug.current == $slug][0]{
     ...,
     "slug": slug.current,
+    ${blogCategoryFragment},
     ${blogAuthorFragment},
     ${imageFragment},
     ${richTextFragment},

@@ -3,16 +3,38 @@ import {
   getDynamicFetchOptions,
   sanityFetch,
 } from "@workspace/sanity/live";
-import { queryAllBlogDataForSearch } from "@workspace/sanity/query";
+import {
+  queryAllBlogDataForSearch,
+  queryBlogCategoryBySlug,
+  queryBlogCategoryDataForSearch,
+} from "@workspace/sanity/query";
 import Fuse from "fuse.js";
 import { NextResponse } from "next/server";
 
 async function getSearchableBlogs(
+  perspective: DynamicFetchOptions["perspective"],
+  categoryId?: string
+) {
+  "use cache";
+  const { data } = await sanityFetch({
+    query: categoryId
+      ? queryBlogCategoryDataForSearch
+      : queryAllBlogDataForSearch,
+    params: categoryId ? { categoryId } : {},
+    perspective,
+    stega: false,
+  });
+  return data;
+}
+
+async function getCategoryBySlug(
+  slug: string,
   perspective: DynamicFetchOptions["perspective"]
 ) {
   "use cache";
   const { data } = await sanityFetch({
-    query: queryAllBlogDataForSearch,
+    query: queryBlogCategoryBySlug,
+    params: { slug },
     perspective,
     stega: false,
   });
@@ -22,13 +44,22 @@ async function getSearchableBlogs(
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   const query = searchParams.get("q");
+  const categorySlug = searchParams.get("category");
 
   if (!query) {
     return NextResponse.json({ error: "Query is required" }, { status: 400 });
   }
 
   const { perspective } = await getDynamicFetchOptions();
-  const data = await getSearchableBlogs(perspective);
+  const category = categorySlug
+    ? await getCategoryBySlug(categorySlug, perspective)
+    : null;
+
+  if (categorySlug && !category) {
+    return NextResponse.json({ error: "Category not found" }, { status: 404 });
+  }
+
+  const data = await getSearchableBlogs(perspective, category?._id);
 
   if (!data) {
     return NextResponse.json({ error: "No data found" }, { status: 404 });

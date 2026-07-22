@@ -10,6 +10,7 @@ import {
   PanelBottom,
   PanelBottomIcon,
   Settings2,
+  Tag,
   TrendingUpDown,
   User,
 } from "lucide-react";
@@ -117,6 +118,7 @@ export const structure = (
         list: { type: "blog", title: "Blogs", icon: FileText },
         context,
       }),
+      createList({ S, type: "category", title: "Categories", icon: Tag }),
       createList({
         S,
         type: "faq",

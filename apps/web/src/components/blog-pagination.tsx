@@ -7,12 +7,17 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "@workspace/ui/components/pagination";
+
+import { type SortOption, DEFAULT_SORT } from "@/lib/sort";
+
 export type PaginationProps = {
   currentPage: number;
   totalPages: number;
   hasNextPage: boolean;
   hasPreviousPage: boolean;
   basePath?: string;
+  categorySlug?: string | null;
+  sortOption?: SortOption;
 };
 
 interface BlogPaginationProps extends PaginationProps {
@@ -65,15 +70,25 @@ export function BlogPagination({
   hasNextPage,
   hasPreviousPage,
   basePath = "/blog",
+  categorySlug,
+  sortOption,
   className,
 }: BlogPaginationProps) {
   const paginationItems = generatePaginationItems(currentPage, totalPages);
 
   const getPageUrl = (page: number): string => {
-    if (page === 1) {
-      return basePath;
+    const searchParams = new URLSearchParams();
+    if (categorySlug) {
+      searchParams.set("category", categorySlug);
     }
-    return `${basePath}?page=${page}`;
+    if (sortOption && sortOption !== DEFAULT_SORT) {
+      searchParams.set("sort", sortOption);
+    }
+    if (page > 1) {
+      searchParams.set("page", page.toString());
+    }
+    const query = searchParams.toString();
+    return query ? `${basePath}?${query}` : basePath;
   };
 
   return (

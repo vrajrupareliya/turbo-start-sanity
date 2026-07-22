@@ -4,6 +4,9 @@ import { Input } from "@workspace/ui/components/input";
 import { cn } from "@workspace/tailwind-config/utils";
 import { Search, X } from "lucide-react";
 
+import { BlogSearchResults } from "@/components/blog-search-results";
+import { useBlogSearch } from "@/hooks/use-blog-search";
+
 export function SearchInput({
   className,
   placeholder,
@@ -51,5 +54,31 @@ export function SearchInput({
         </div>
       </div>
     </div>
+  );
+}
+
+export function BlogSearch({ categorySlug }: { categorySlug?: string | null }) {
+  const { searchQuery, setSearchQuery, results, isSearching, hasQuery, error } =
+    useBlogSearch(categorySlug);
+
+  return (
+    <>
+      <SearchInput
+        className="mt-8 mb-12"
+        onChange={setSearchQuery}
+        onClear={() => setSearchQuery("")}
+        placeholder="Search blogs..."
+        value={searchQuery}
+      />
+      {hasQuery && (
+        <BlogSearchResults
+          error={error}
+          hasQuery={hasQuery}
+          isSearching={isSearching}
+          results={results}
+          searchQuery={searchQuery}
+        />
+      )}
+    </>
   );
 }
