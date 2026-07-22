@@ -197,11 +197,7 @@ export const queryAllBlogDataForSearch = defineQuery(`
   }
 `);
 
-export const queryBlogCategoryDataForSearch = defineQuery(`
-  *[_type == "blog" && category._ref == $categoryId && defined(slug.current) && (seoHideFromLists != true)]{
-    ${blogCardFragment}
-  }
-`);
+
 
 export const queryBlogIndexPageBlogsCount = defineQuery(`
   count(*[_type == "blog" && (seoHideFromLists != true)])

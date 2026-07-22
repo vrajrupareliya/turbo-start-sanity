@@ -3,6 +3,7 @@
 import { Input } from "@workspace/ui/components/input";
 import { cn } from "@workspace/tailwind-config/utils";
 import { Search, X } from "lucide-react";
+import { useCallback, useEffect, useRef } from "react";
 
 import { BlogSearchResults } from "@/components/blog-search-results";
 import { useBlogSearch } from "@/hooks/use-blog-search";
@@ -60,17 +61,57 @@ export function SearchInput({
 export function BlogSearch({ categorySlug }: { categorySlug?: string | null }) {
   const { searchQuery, setSearchQuery, results, isSearching, hasQuery, error } =
     useBlogSearch(categorySlug);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const isOpen = hasQuery;
+
+  const handleClose = useCallback(() => {
+    setSearchQuery("");
+  }, [setSearchQuery]);
+
+  // Close on Escape key
+  useEffect(() => {
+    if (!isOpen) {
+      return;
+    }
+
+    function handleKeyDown(event: KeyboardEvent) {
+      if (event.key === "Escape") {
+        handleClose();
+      }
+    }
+
+    document.addEventListener("keydown", handleKeyDown);
+    return () => document.removeEventListener("keydown", handleKeyDown);
+  }, [isOpen, handleClose]);
+
+  // Close on click outside
+  useEffect(() => {
+    if (!isOpen) {
+      return;
+    }
+
+    function handleClickOutside(event: MouseEvent) {
+      if (
+        containerRef.current &&
+        !containerRef.current.contains(event.target as Node)
+      ) {
+        handleClose();
+      }
+    }
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [isOpen, handleClose]);
 
   return (
-    <>
+    <div className="relative mt-8 mb-12" ref={containerRef}>
       <SearchInput
-        className="mt-8 mb-12"
         onChange={setSearchQuery}
         onClear={() => setSearchQuery("")}
         placeholder="Search blogs..."
         value={searchQuery}
       />
-      {hasQuery && (
+      {isOpen && (
         <BlogSearchResults
           error={error}
           hasQuery={hasQuery}
@@ -79,6 +120,6 @@ export function BlogSearch({ categorySlug }: { categorySlug?: string | null }) {
           searchQuery={searchQuery}
         />
       )}
-    </>
+    </div>
   );
 }

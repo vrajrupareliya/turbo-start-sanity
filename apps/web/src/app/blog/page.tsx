@@ -6,13 +6,11 @@ import {
 } from "@workspace/sanity/live";
 import {
   queryBlogCategories,
-  queryBlogCategoryBlogs,
   queryBlogCategoryBlogsCount,
   queryBlogCategoryBlogsLatest,
   queryBlogCategoryBlogsOldest,
   queryBlogCategoryBlogsTitleAsc,
   queryBlogCategoryBySlug,
-  queryBlogIndexPageBlogs,
   queryBlogIndexPageBlogsCount,
   queryBlogIndexPageBlogsLatest,
   queryBlogIndexPageBlogsOldest,

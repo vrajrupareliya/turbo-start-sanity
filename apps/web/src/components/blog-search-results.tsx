@@ -1,114 +1,89 @@
 "use client";
 
 import { cn } from "@workspace/tailwind-config/utils";
+import Link from "next/link";
 
-import { BlogList } from "@/components/blog-list";
-import type { Blog } from "@/types";
+import type { AlgoliaBlogHit } from "@/lib/algolia";
 
 type BlogSearchResultsProps = {
   className?: string;
-  results: Blog[];
+  results: AlgoliaBlogHit[];
   isSearching: boolean;
   hasQuery: boolean;
   searchQuery: string;
   error?: Error | null;
 };
 
-function SearchResultsHeader({
-  query,
-  count,
-}: {
-  query: string;
-  count: number;
-}) {
+function HighlightedText({ hit, attribute }: { hit: AlgoliaBlogHit; attribute: string }) {
+  const highlight = hit._highlightResult?.[attribute];
+  if (highlight?.value) {
+    return (
+      <span
+        dangerouslySetInnerHTML={{ __html: highlight.value }}
+      />
+    );
+  }
+  const raw = hit[attribute as keyof typeof hit];
+  return <>{typeof raw === "string" ? raw : ""}</>;
+}
+
+function SearchResultItem({ hit }: { hit: AlgoliaBlogHit }) {
   return (
-    <div className="mb-6">
-      <h2 className="font-semibold text-lg">Search Results for "{query}"</h2>
-      <p className="text-muted-foreground text-sm">
-        {count === 0
-          ? "No articles found"
-          : `${count} article${count === 1 ? "" : "s"} found`}
+    <Link
+      className="flex items-start gap-3 rounded-lg px-3 py-2.5 transition-colors hover:bg-muted focus:bg-muted focus:outline-none"
+      href={hit.slug ?? "#"}
+    >
+      <div className="min-w-0 flex-1">
+        <p className="truncate font-medium text-sm text-foreground [&>mark]:bg-primary/20 [&>mark]:text-foreground [&_mark]:bg-primary/20 [&_mark]:text-foreground">
+          <HighlightedText attribute="title" hit={hit} />
+        </p>
+        <p className="mt-0.5 line-clamp-1 text-muted-foreground text-xs [&>mark]:bg-primary/20 [&>mark]:text-foreground [&_mark]:bg-primary/20 [&_mark]:text-foreground">
+          <HighlightedText attribute="description" hit={hit} />
+        </p>
+      </div>
+      {hit.category?.title && (
+        <span className="mt-0.5 shrink-0 rounded-full bg-muted px-2 py-0.5 text-muted-foreground text-xs">
+          {hit.category.title}
+        </span>
+      )}
+    </Link>
+  );
+}
+
+function DropdownLoadingState() {
+  return (
+    <div className="space-y-2 p-3">
+      {Array.from({ length: 3 }).map((_, i) => (
+        <div className="flex items-start gap-3" key={`search-skeleton-${i.toString()}`}>
+          <div className="min-w-0 flex-1 space-y-1.5">
+            <div className="h-4 w-3/4 animate-pulse rounded bg-muted" />
+            <div className="h-3 w-1/2 animate-pulse rounded bg-muted" />
+          </div>
+          <div className="h-5 w-16 animate-pulse rounded-full bg-muted" />
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function DropdownEmptyState({ query }: { query: string }) {
+  return (
+    <div className="px-3 py-6 text-center">
+      <p className="font-medium text-foreground text-sm">No results found</p>
+      <p className="mt-1 text-muted-foreground text-xs">
+        No articles matching &ldquo;{query}&rdquo;. Try different keywords.
       </p>
     </div>
   );
 }
 
-function EmptySearchState({ query }: { query: string }) {
+function DropdownErrorState() {
   return (
-    <div className="py-12 text-center">
-      <div className="mx-auto max-w-md">
-        <h3 className="mb-2 font-medium text-foreground text-lg">
-          No articles found
-        </h3>
-        <p className="mb-4 text-muted-foreground">
-          We couldn't find any articles matching "{query}". Try adjusting your
-          search terms.
-        </p>
-        <div className="text-muted-foreground text-sm">
-          <p>Suggestions:</p>
-          <ul className="mt-2 space-y-1">
-            <li>• Check your spelling</li>
-            <li>• Try different keywords</li>
-            <li>• Use more general terms</li>
-          </ul>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function ErrorState({ query }: { query: string }) {
-  return (
-    <div className="py-12 text-center">
-      <div className="mx-auto max-w-md">
-        <h3 className="mb-2 font-medium text-destructive text-lg">
-          Search failed
-        </h3>
-        <p className="mb-4 text-muted-foreground">
-          We encountered an error while searching for "{query}". Please try
-          again.
-        </p>
-        <div className="text-muted-foreground text-sm">
-          <p>If the problem persists:</p>
-          <ul className="mt-2 space-y-1">
-            <li>• Check your internet connection</li>
-            <li>• Refresh the page</li>
-            <li>• Try again in a few moments</li>
-          </ul>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-const LOADING_SKELETONS = [
-  "skeleton-1",
-  "skeleton-2",
-  "skeleton-3",
-  "skeleton-4",
-  "skeleton-5",
-  "skeleton-6",
-] as const;
-
-function LoadingState() {
-  return (
-    <div className="space-y-6">
-      <div className="mb-6">
-        <div className="mb-2 h-6 w-48 animate-pulse rounded bg-muted" />
-        <div className="h-4 w-32 animate-pulse rounded bg-muted" />
-      </div>
-      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-2">
-        {LOADING_SKELETONS.map((id) => (
-          <div className="space-y-4" key={id}>
-            <div className="aspect-video animate-pulse rounded-2xl bg-muted" />
-            <div className="space-y-2">
-              <div className="h-4 w-24 animate-pulse rounded bg-muted" />
-              <div className="h-6 w-full animate-pulse rounded bg-muted" />
-              <div className="h-4 w-3/4 animate-pulse rounded bg-muted" />
-            </div>
-          </div>
-        ))}
-      </div>
+    <div className="px-3 py-6 text-center">
+      <p className="font-medium text-destructive text-sm">Search failed</p>
+      <p className="mt-1 text-muted-foreground text-xs">
+        Please try again in a moment.
+      </p>
     </div>
   );
 }
@@ -125,25 +100,30 @@ export function BlogSearchResults({
     return null;
   }
 
-  if (isSearching) {
-    return (
-      <section className={cn("mt-8", className)}>
-        <LoadingState />
-      </section>
-    );
-  }
-
   return (
-    <section className={cn("mt-8", className)}>
-      <SearchResultsHeader count={results.length} query={searchQuery} />
-
-      {error ? (
-        <ErrorState query={searchQuery} />
-      ) : results.length === 0 ? (
-        <EmptySearchState query={searchQuery} />
-      ) : (
-        <BlogList blogs={results} />
+    <div
+      className={cn(
+        "absolute top-full right-0 left-0 z-10 mx-auto mt-1 max-h-80 w-full max-w-lg overflow-y-auto rounded-xl border border-border bg-popover shadow-lg",
+        className
       )}
-    </section>
+      role="listbox"
+    >
+      {isSearching ? (
+        <DropdownLoadingState />
+      ) : error ? (
+        <DropdownErrorState />
+      ) : results.length === 0 ? (
+        <DropdownEmptyState query={searchQuery} />
+      ) : (
+        <div className="p-1">
+          <p className="px-3 py-1.5 text-muted-foreground text-xs">
+            {results.length} result{results.length === 1 ? "" : "s"}
+          </p>
+          {results.map((hit) => (
+            <SearchResultItem hit={hit} key={hit.objectID} />
+          ))}
+        </div>
+      )}
+    </div>
   );
 }

@@ -15,6 +15,10 @@ const env = createEnv({
     // Shared secret for the `/api/revalidate-sync-tags` webhook. Optional so
     // existing deployments still boot; the webhook fails closed when unset.
     SANITY_REVALIDATE_SECRET: z.string().min(1).optional(),
+    ALGOLIA_APP_ID: z.string().min(1),
+    ALGOLIA_ADMIN_API_KEY: z.string().min(1),
+    ALGOLIA_API_KEY: z.string().min(1),
+    ALGOLIA_INDEX_NAME: z.string().min(1),
   },
 
   experimental__runtimeEnv: {

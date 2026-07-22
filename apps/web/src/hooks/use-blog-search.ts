@@ -1,54 +1,60 @@
 import { useQuery } from "@tanstack/react-query";
-import { useState } from "react";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { useCallback, useState } from "react";
 
-import type { Blog } from "@/types";
+import { type AlgoliaBlogHit, searchBlogs } from "@/lib/algolia";
+
 import { useDebounce } from "./use-debounce";
 
-const SEARCH_DEBOUNCE_MS = 400;
+const SEARCH_DEBOUNCE_MS = 300;
 const CACHE_STALE_TIME_MS = 30_000;
 
-async function searchBlog(
-  query: string,
-  categorySlug: string | null | undefined,
-  signal: AbortSignal
-) {
-  if (!query.trim()) {
-    return [];
-  }
-
-  const params = new URLSearchParams({ q: query });
-  if (categorySlug) {
-    params.set("category", categorySlug);
-  }
-
-  const response = await fetch(`/api/blog/search?${params.toString()}`, {
-    signal,
-  });
-
-  if (!response.ok) {
-    throw new Error("Failed to search");
-  }
-
-  return response.json() as Promise<Blog[]>;
-}
-
 export function useBlogSearch(categorySlug?: string | null) {
-  const [searchQuery, setSearchQuery] = useState("");
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+
+  const initialQuery = searchParams.get("q") ?? "";
+  const [searchQuery, setSearchQueryState] = useState(initialQuery);
   const debouncedQuery = useDebounce(searchQuery, SEARCH_DEBOUNCE_MS);
 
+  const setSearchQuery = useCallback(
+    (value: string) => {
+      setSearchQueryState(value);
+
+      // Sync URL on next tick to avoid blocking the input
+      const params = new URLSearchParams(searchParams.toString());
+      if (value.trim()) {
+        params.set("q", value.trim());
+      } else {
+        params.delete("q");
+      }
+      // Remove page param when searching
+      params.delete("page");
+      const query = params.toString();
+      router.replace(query ? `${pathname}?${query}` : pathname, {
+        scroll: false,
+      });
+    },
+    [router, pathname, searchParams]
+  );
+
   const hasQuery = debouncedQuery.trim().length > 0;
+
   const { data, isLoading, error } = useQuery({
     queryKey: ["blog-search", categorySlug, debouncedQuery],
-    queryFn: ({ signal }) => searchBlog(debouncedQuery, categorySlug, signal),
+    queryFn: ({ signal }) =>
+      searchBlogs(debouncedQuery, { categorySlug, signal }),
     enabled: hasQuery,
     staleTime: CACHE_STALE_TIME_MS,
   });
+
   return {
     searchQuery,
     setSearchQuery,
-    results: data ?? [],
-    isSearching: isLoading,
-    error,
+    results: (data?.hits ?? []) as AlgoliaBlogHit[],
+    isSearching: isLoading && hasQuery,
+    error: error ?? null,
     hasQuery,
   };
 }
