@@ -72,7 +72,9 @@ export function ArticleJsonLd({
 
   const baseUrl = getBaseUrl();
   const articleUrl = `${baseUrl}${article.slug}`;
-  const imageUrl = buildSafeImageUrl(article.image);
+  const imageUrl = article.pokemonId
+    ? `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${article.pokemonId}.png`
+    : undefined;
 
   const articleJsonLd: WithContext<Article> = {
     "@context": "https://schema.org",

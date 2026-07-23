@@ -16,10 +16,10 @@ import {
   RichText,
   type RichTextValue,
 } from "@workspace/sanity-blocks/internal/rich-text";
-import { SanityImage } from "@workspace/sanity-blocks/internal/sanity-image";
 
 import { TableOfContent } from "@/components/elements/table-of-content";
 import { ArticleJsonLd } from "@/components/json-ld";
+import { PokemonSprite } from "@/components/pokemon-sprite";
 import { getSEOMetadata } from "@/lib/seo";
 
 const logger = new Logger("BlogSlug");
@@ -139,7 +139,7 @@ function BlogPageContent({
 }: {
   data: NonNullable<Awaited<ReturnType<typeof getCachedBlogPage>>>;
 }) {
-  const { title, description, image, richText } = data ?? {};
+  const { title, description, richText, pokemonId } = data ?? {};
 
   return (
     <div className="container my-16">
@@ -150,18 +150,23 @@ function BlogPageContent({
             <h1 className="mt-2 font-bold text-4xl">{title}</h1>
             <p className="mt-4 text-lg text-muted-foreground">{description}</p>
           </header>
-          {image && (
-            <div className="mb-12">
-              <SanityImage
-                alt={title}
-                className="h-auto w-full rounded-lg"
-                height={900}
-                image={image}
-                loading="eager"
-                width={1600}
+
+          <div className="mb-12 flex justify-center rounded-2xl bg-muted/30 p-8 sm:p-12">
+            <Suspense
+              fallback={
+                <div className="h-64 w-64 animate-pulse rounded-2xl bg-muted" />
+              }
+            >
+              <PokemonSprite
+                alt={title ?? "Blog hero artwork"}
+                className="h-auto max-h-[350px] w-full max-w-[350px] object-contain"
+                height={350}
+                pokemonId={pokemonId}
+                width={350}
               />
-            </div>
-          )}
+            </Suspense>
+          </div>
+
           <RichText richText={richText as RichTextValue} />
         </main>
 

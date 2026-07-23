@@ -58,7 +58,7 @@ async function handleReindex(request: Request) {
         ? new Date(post.publishedAt).getTime()
         : 0,
       orderRank: post.orderRank,
-      image: post.image as Record<string, unknown> | null,
+      pokemonId: post.pokemonId,
       category: post.category,
       authors: post.authors,
     }));

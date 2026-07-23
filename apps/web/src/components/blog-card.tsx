@@ -1,28 +1,8 @@
-import { SanityImage } from "@workspace/sanity-blocks/internal/sanity-image";
 import Link from "next/link";
+import { Suspense } from "react";
 
+import { PokemonSprite } from "@/components/pokemon-sprite";
 import type { Blog } from "@/types";
-
-type BlogImageProps = {
-  image: Blog["image"];
-  title?: string | null;
-};
-
-function BlogImage({ image, title }: BlogImageProps) {
-  if (!image?.id) {
-    return null;
-  }
-
-  return (
-    <SanityImage
-      alt={title ?? "Blog post image"}
-      className="aspect-video w-full rounded-2xl bg-gray-100 object-cover sm:aspect-2/1 lg:aspect-3/2"
-      height={400}
-      image={image}
-      width={800}
-    />
-  );
-}
 
 type BlogCardProps = {
   blog: Blog;
@@ -76,11 +56,26 @@ function BlogContent({
 }
 
 export function FeaturedBlogCard({ blog }: BlogCardProps) {
-  const { title, publishedAt, slug, description, image } = blog ?? {};
+  const { title, publishedAt, slug, description, pokemonId } = blog ?? {};
 
   return (
     <article className="grid w-full grid-cols-1 gap-8 lg:grid-cols-2">
-      <BlogImage image={image} title={title} />
+      <div className="relative flex aspect-video w-full items-center justify-center overflow-hidden rounded-2xl bg-muted/30 p-4 sm:aspect-2/1 lg:aspect-3/2">
+        <Suspense
+          fallback={
+            <div className="h-full w-full animate-pulse rounded-2xl bg-muted" />
+          }
+        >
+          <PokemonSprite
+            alt={title ?? "Blog artwork"}
+            className="h-full w-full object-contain p-4"
+            height={400}
+            pokemonId={pokemonId}
+            width={400}
+          />
+        </Suspense>
+        <div className="pointer-events-none absolute inset-0 rounded-2xl ring-1 ring-gray-900/10 ring-inset" />
+      </div>
       <div className="space-y-6">
         <BlogMeta publishedAt={publishedAt} />
         <BlogContent
@@ -108,13 +103,25 @@ export function BlogCard({ blog }: BlogCardProps) {
     );
   }
 
-  const { title, publishedAt, slug, description, image } = blog;
+  const { title, publishedAt, slug, description, pokemonId } = blog;
 
   return (
     <article className="grid w-full grid-cols-1 gap-4">
-      <div className="relative aspect-video h-auto w-full overflow-hidden rounded-2xl">
-        <BlogImage image={image} title={title} />
-        <div className="absolute inset-0 rounded-2xl ring-1 ring-gray-900/10 ring-inset" />
+      <div className="relative flex aspect-video h-auto w-full items-center justify-center overflow-hidden rounded-2xl bg-muted/30 p-4">
+        <Suspense
+          fallback={
+            <div className="h-full w-full animate-pulse rounded-2xl bg-muted" />
+          }
+        >
+          <PokemonSprite
+            alt={title ?? "Blog artwork"}
+            className="h-full w-full object-contain p-2"
+            height={300}
+            pokemonId={pokemonId}
+            width={300}
+          />
+        </Suspense>
+        <div className="pointer-events-none absolute inset-0 rounded-2xl ring-1 ring-gray-900/10 ring-inset" />
       </div>
       <div className="w-full space-y-4">
         <BlogMeta publishedAt={publishedAt} />

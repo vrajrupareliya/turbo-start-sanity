@@ -93,7 +93,7 @@ const blogCardFragment = /* groq */ `
   description,
   "slug":slug.current,
   orderRank,
-  ${imageFragment},
+  pokemonId,
   publishedAt,
   ${blogCategoryFragment},
   ${blogAuthorFragment}
@@ -272,7 +272,6 @@ export const queryBlogSlugPageData = defineQuery(`
     "slug": slug.current,
     ${blogCategoryFragment},
     ${blogAuthorFragment},
-    ${imageFragment},
     ${richTextFragment},
     ${pageBuilderFragment}
   }

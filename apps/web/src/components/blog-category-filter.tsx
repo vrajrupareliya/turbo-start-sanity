@@ -76,11 +76,10 @@ export function BlogCategoryFilter({
       aria-labelledby="blog-category-filter-title"
       className="mt-8 sm:mt-12"
     >
-      <div className="flex items-center justify-between gap-4 pt-4 pb-3">
+      <div className="flex flex-col gap-3 pt-4 pb-3 sm:flex-row sm:items-center sm:justify-between">
         <nav
           aria-label="Blog categories"
           className="flex gap-2 overflow-x-auto pt-1 pb-1 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
-
         >
           <CategoryPill
             href={getCategoryHref(undefined, selectedSort)}
@@ -98,7 +97,9 @@ export function BlogCategoryFilter({
             />
           ))}
         </nav>
-         <BlogSortSelect selectedSort={selectedSort} />
+        <div className="shrink-0">
+          <BlogSortSelect selectedSort={selectedSort} />
+        </div>
       </div>
       {categoriesLoadFailed ? (
         <p className="mt-3 text-muted-foreground text-sm" role="status">

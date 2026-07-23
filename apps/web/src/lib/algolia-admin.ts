@@ -51,7 +51,7 @@ export type AlgoliaRecord = {
   publishedAt: string | null;
   publishedAtTimestamp: number;
   orderRank: string | null;
-  image: Record<string, unknown> | null;
+  pokemonId: number | null;
   category: {
     _id: string;
     title: string | null;

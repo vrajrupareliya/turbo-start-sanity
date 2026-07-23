@@ -5,7 +5,8 @@ import {
 import { FileTextIcon } from "lucide-react";
 import { defineArrayMember, defineField, defineType } from "sanity";
 
-import { documentSlugField, imageWithAltField } from "@/schemaTypes/common";
+import { documentSlugField } from "@/schemaTypes/common";
+import { PokemonInput } from "@/components/pokemon-input";
 import { GROUP, GROUPS } from "@/utils/constant";
 import { ogFields } from "@/utils/og-fields";
 import { seoFields } from "@/utils/seo-fields";
@@ -105,13 +106,6 @@ export const blog = defineType({
         "The date when your blog post will appear to have been published",
       group: GROUP.MAIN_CONTENT,
     }),
-    imageWithAltField({
-      title: "Image",
-      description:
-        "The main picture that will appear at the top of your blog post and in previews",
-      group: GROUP.MAIN_CONTENT,
-      validation: (Rule) => Rule.required(),
-    }),
     defineField({
       name: "richText",
       type: "richText",
@@ -119,13 +113,23 @@ export const blog = defineType({
         "The main content of your blog post with text, images, and formatting",
       group: GROUP.MAIN_CONTENT,
     }),
+    defineField({
+      name: "pokemonId",
+      type: "number",
+      title: "Pokémon",
+      description:
+        "Select a Pokémon to serve as the hero artwork for this blog post",
+      group: GROUP.MAIN_CONTENT,
+      components: {
+        input: PokemonInput,
+      },
+    }),
     ...seoFields,
     ...ogFields,
   ],
   preview: {
     select: {
       title: "title",
-      media: "image",
       isPrivate: "seoNoIndex",
       isHidden: "seoHideFromLists",
       slug: "slug.current",
@@ -135,7 +139,6 @@ export const blog = defineType({
     },
     prepare: ({
       title,
-      media,
       isPrivate,
       isHidden,
       author,
@@ -159,7 +162,6 @@ export const blog = defineType({
 
       return {
         title: title || "Untitled Blog",
-        media,
         subtitle: `🔗 ${slug} | ${visibility} | ${category || "No category"} | ${authorInfo} | ${dateInfo}`,
       };
     },

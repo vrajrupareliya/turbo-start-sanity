@@ -5,14 +5,12 @@ import type {
   QueryBlogSlugPageDataResult,
 } from "@workspace/sanity/types";
 import {
-  imageToMarkdown,
   type MarkdownBlock,
   pageBuilderToMarkdown,
 } from "@workspace/sanity-blocks/internal/page-builder-to-markdown";
 import {
   absolutizeUrl,
   escapeMarkdown,
-  type MarkdownImage,
   type MarkdownOptions,
   type PortableTextValue,
   portableTextToMarkdown,
@@ -44,7 +42,7 @@ const markdownOptions: MarkdownOptions = { resolveImageUrl, baseUrl: BASE_URL };
 export type MarkdownDocument = Partial<
   Pick<
     NonNullable<QueryBlogSlugPageDataResult>,
-    "title" | "description" | "image" | "richText" | "pageBuilder"
+    "title" | "description" | "pokemonId" | "richText" | "pageBuilder"
   >
 >;
 
@@ -87,10 +85,9 @@ export function pageToMarkdown(doc: MarkdownDocument): string {
 }
 
 export function blogPostToMarkdown(doc: MarkdownDocument): string {
-  const cover = imageToMarkdown(
-    doc.image as MarkdownImage | null,
-    markdownOptions
-  );
+  const cover = doc.pokemonId
+    ? `![Pokémon Hero Artwork](https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${doc.pokemonId}.png)`
+    : "";
 
   return withTrailingNewline([
     documentHeader(doc),
