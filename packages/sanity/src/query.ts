@@ -103,6 +103,7 @@ const blogCardFragment = /* groq */ `
   "slug":slug.current,
   orderRank,
   category,
+  "categories": array::compact(coalesce(categories, select(defined(category) => [category], []))),
   ${imageFragment},
   publishedAt,
   ${blogAuthorFragment}
@@ -195,16 +196,13 @@ export const queryBlogIndexPage = defineQuery(`
     "ogImage": seoImage.asset->url + "?w=1200&h=630&fit=crop&fm=jpg&q=80",
     ${pageBuilderFragment},
     "slug": slug.current,
-    "featuredBlogs": select(
-      $category == "" => *[_type == "blog" && featured == true && defined(slug.current) && (seoHideFromLists != true)] | order(orderRank asc){
-        ${blogCardFragment}
-      },
-      []
-    ),
-    "blogs": *[_type == "blog" && defined(slug.current) && (seoHideFromLists != true) && ($category == "" || category == $category) && ($category != "" || featured != true)] | order(orderRank asc) [$start...$end]{
+    "featuredBlogs": *[_type == "blog" && featured == true && defined(slug.current) && (seoHideFromLists != true)] | order(orderRank asc){
       ${blogCardFragment}
     },
-    "total": count(*[_type == "blog" && defined(slug.current) && (seoHideFromLists != true) && ($category == "" || category == $category) && ($category != "" || featured != true)])
+    "blogs": *[_type == "blog" && defined(slug.current) && (seoHideFromLists != true)] | order(orderRank asc){
+      ${blogCardFragment}
+    },
+    "total": count(*[_type == "blog" && defined(slug.current) && (seoHideFromLists != true)])
   }
 `);
 

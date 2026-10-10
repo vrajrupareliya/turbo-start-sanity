@@ -12,46 +12,12 @@ export type PaginationProps = {
 type BlogPaginationProps = PaginationProps & {
   className?: string;
   category?: string;
+  categories?: string[];
+  sort?: string;
+  onPageChange?: (page: number) => void;
 };
 
 type PaginationItem = number | "ellipsis-start" | "ellipsis-end";
-
-function generatePaginationItems(
-  currentPage: number,
-  totalPages: number
-): PaginationItem[] {
-  const items: PaginationItem[] = [];
-  const delta = 2; // Number of pages to show around current page
-
-  if (totalPages <= 7) {
-    for (let i = 1; i <= totalPages; i++) {
-      items.push(i);
-    }
-  } else {
-    items.push(1);
-
-    if (currentPage - delta > 2) {
-      items.push("ellipsis-start");
-    }
-
-    const start = Math.max(2, currentPage - delta);
-    const end = Math.min(totalPages - 1, currentPage + delta);
-
-    for (let i = start; i <= end; i++) {
-      items.push(i);
-    }
-
-    if (currentPage + delta < totalPages - 1) {
-      items.push("ellipsis-end");
-    }
-
-    if (totalPages > 1) {
-      items.push(totalPages);
-    }
-  }
-
-  return items;
-}
 
 const navLabelBase = "font-light text-base leading-5 transition-colors";
 
@@ -63,13 +29,49 @@ export function BlogPagination({
   basePath = "/blog",
   className,
   category,
+  categories,
+  sort,
+  onPageChange,
 }: BlogPaginationProps) {
-  const paginationItems = generatePaginationItems(currentPage, totalPages);
+  const paginationItems: PaginationItem[] = [];
+  const delta = 2;
+
+  if (totalPages <= 7) {
+    for (let i = 1; i <= totalPages; i++) {
+      paginationItems.push(i);
+    }
+  } else {
+    paginationItems.push(1);
+
+    if (currentPage - delta > 2) {
+      paginationItems.push("ellipsis-start");
+    }
+
+    const start = Math.max(2, currentPage - delta);
+    const end = Math.min(totalPages - 1, currentPage + delta);
+
+    for (let i = start; i <= end; i++) {
+      paginationItems.push(i);
+    }
+
+    if (currentPage + delta < totalPages - 1) {
+      paginationItems.push("ellipsis-end");
+    }
+
+    if (totalPages > 1) {
+      paginationItems.push(totalPages);
+    }
+  }
 
   const getPageUrl = (page: number): string => {
     const params = new URLSearchParams();
-    if (category) {
+    if (categories && categories.length > 0) {
+      params.set("categories", categories.join(","));
+    } else if (category) {
       params.set("category", category);
+    }
+    if (sort && sort !== "newest") {
+      params.set("sort", sort);
     }
     if (page > 1) {
       params.set("page", String(page));
@@ -91,6 +93,12 @@ export function BlogPagination({
             "focus-ring rounded-none text-zinc-400 hover:text-foreground"
           )}
           href={getPageUrl(currentPage - 1)}
+          onClick={(e) => {
+            if (onPageChange) {
+              e.preventDefault();
+              onPageChange(currentPage - 1);
+            }
+          }}
         >
           Previous
         </Link>
@@ -127,6 +135,12 @@ export function BlogPagination({
             className="focus-ring rounded-none px-0.5 font-light font-mono text-base text-zinc-400 leading-5 transition-colors hover:text-foreground"
             href={getPageUrl(item)}
             key={item}
+            onClick={(e) => {
+              if (onPageChange) {
+                e.preventDefault();
+                onPageChange(item);
+              }
+            }}
           >
             {item}
           </Link>
@@ -141,6 +155,12 @@ export function BlogPagination({
             "focus-ring rounded-none text-zinc-400 hover:text-foreground"
           )}
           href={getPageUrl(currentPage + 1)}
+          onClick={(e) => {
+            if (onPageChange) {
+              e.preventDefault();
+              onPageChange(currentPage + 1);
+            }
+          }}
         >
           Next
         </Link>

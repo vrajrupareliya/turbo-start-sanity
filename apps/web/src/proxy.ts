@@ -3,7 +3,7 @@ import { type NextRequest, NextResponse } from "next/server";
 import { normalizeMarkdownPath, prefersMarkdown } from "@/lib/markdown-path";
 
 /** Query params the Markdown route honours — blog index pagination + filter. */
-const FORWARDED_PARAMS = ["page", "category"] as const;
+const FORWARDED_PARAMS = ["page", "category", "categories", "sort"] as const;
 
 /**
  * Content negotiation for Markdown: a `.md` URL or `Accept: text/markdown` is

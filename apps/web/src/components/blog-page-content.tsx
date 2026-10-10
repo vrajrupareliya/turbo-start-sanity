@@ -1,22 +1,28 @@
+"use client";
+
 import type { QueryBlogIndexPageResult } from "@workspace/sanity/types";
 import type { ReactNode } from "react";
 
 import { BlogHeader, FeaturedBlogCard } from "@/components/blog-card";
 import { BlogCategoryFilter } from "@/components/blog-category-filter";
+import {
+  BlogFilterToolbar,
+  type SortOrder,
+} from "@/components/blog-filter-toolbar";
 import { BlogList } from "@/components/blog-list";
 import { BlogPagination } from "@/components/blog-pagination";
 import { BlogSearchLayout } from "@/components/blog-search-layout";
 import { Breadcrumbs } from "@/components/breadcrumbs";
+import { useBlogFilter } from "@/hooks/use-blog-filter";
 import type { Blog } from "@/types";
-import type { PaginationMetadata } from "@/utils";
 
 type BlogPageContentProps = {
   indexPageData: NonNullable<QueryBlogIndexPageResult>;
   blogs: Blog[];
-  // Already excluded from `blogs` by the query, so the two never overlap.
   featuredBlogs: Blog[];
-  paginationMetadata: PaginationMetadata;
-  activeCategory: string;
+  initialCategories?: string[];
+  initialSort?: SortOrder;
+  initialPage?: number;
   children?: ReactNode;
 };
 
@@ -24,14 +30,41 @@ export function BlogPageContent({
   indexPageData,
   blogs,
   featuredBlogs,
-  paginationMetadata,
-  activeCategory,
+  initialCategories = [],
+  initialSort = "newest",
+  initialPage = 1,
   children,
 }: BlogPageContentProps) {
   const { title, description } = indexPageData;
 
+  const {
+    selectedCategories,
+    sortOrder,
+    currentPage,
+    availableOptions,
+    paginatedBlogs,
+    totalMatching,
+    totalPages,
+    hasNextPage,
+    hasPreviousPage,
+    onSelectCategory,
+    onRemoveCategory,
+    onClearAll,
+    onSortChange,
+    onPageChange,
+  } = useBlogFilter({
+    allBlogs: blogs,
+    initialCategories,
+    initialSort,
+    initialPage,
+  });
+
+  const hasFilters = selectedCategories.length > 0;
   const showFeatured =
-    paginationMetadata.currentPage === 1 && featuredBlogs.length > 0;
+    !hasFilters &&
+    sortOrder === "newest" &&
+    currentPage === 1 &&
+    featuredBlogs.length > 0;
 
   return (
     <main className="bg-background">
@@ -41,7 +74,13 @@ export function BlogPageContent({
 
         <BlogSearchLayout
           categoryFilter={
-            <BlogCategoryFilter activeCategory={activeCategory} />
+            <BlogCategoryFilter
+              availableOptions={availableOptions}
+              onClearAll={onClearAll}
+              onRemoveCategory={onRemoveCategory}
+              onSelectCategory={onSelectCategory}
+              selectedCategories={selectedCategories}
+            />
           }
           featured={
             showFeatured
@@ -51,19 +90,31 @@ export function BlogPageContent({
               : null
           }
           list={
-            <>
-              <BlogList blogs={blogs} />
-              {paginationMetadata.totalPages > 1 && (
+            <div className="flex flex-col gap-8">
+              <BlogFilterToolbar
+                hasFilters={hasFilters}
+                onSortChange={onSortChange}
+                sortOrder={sortOrder}
+                totalCount={totalMatching}
+              />
+              <BlogList
+                blogs={paginatedBlogs}
+                hasActiveFilters={hasFilters}
+                onClearFilters={onClearAll}
+              />
+              {totalPages > 1 ? (
                 <BlogPagination
-                  category={activeCategory}
-                  className="mt-12"
-                  currentPage={paginationMetadata.currentPage}
-                  hasNextPage={paginationMetadata.hasNextPage}
-                  hasPreviousPage={paginationMetadata.hasPreviousPage}
-                  totalPages={paginationMetadata.totalPages}
+                  categories={selectedCategories}
+                  className="mt-4"
+                  currentPage={currentPage}
+                  hasNextPage={hasNextPage}
+                  hasPreviousPage={hasPreviousPage}
+                  onPageChange={onPageChange}
+                  sort={sortOrder}
+                  totalPages={totalPages}
                 />
-              )}
-            </>
+              ) : null}
+            </div>
           }
         />
       </div>

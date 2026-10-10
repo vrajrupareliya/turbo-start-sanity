@@ -102,11 +102,27 @@ export const blog = defineType({
       group: GROUP.MAIN_CONTENT,
     }),
     defineField({
+      name: "categories",
+      type: "array",
+      title: "Categories",
+      description:
+        "The topics this post belongs to. Used to group and filter posts on the blog listing page.",
+      of: [
+        defineArrayMember({
+          type: "string",
+        }),
+      ],
+      options: {
+        list: BLOG_CATEGORY_OPTIONS,
+      },
+      group: GROUP.MAIN_CONTENT,
+    }),
+    defineField({
       name: "category",
       type: "string",
       title: "Category",
       description:
-        "The topic this post belongs to. Used to group and filter posts in the sidebar on the blog listing page.",
+        "The primary topic this post belongs to. Legacy field, use Categories above for multi-category support.",
       group: GROUP.MAIN_CONTENT,
       options: {
         list: BLOG_CATEGORY_OPTIONS,

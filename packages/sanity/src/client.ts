@@ -14,6 +14,17 @@ export const client = createClient({
   stega: {
     studioUrl: env.NEXT_PUBLIC_SANITY_STUDIO_URL,
     enabled: env.NODE_ENV === "development",
+    filter: (props) => {
+      const last = props.sourcePath.at(-1);
+      if (
+        last === "category" ||
+        last === "categories" ||
+        props.sourcePath.includes("categories")
+      ) {
+        return false;
+      }
+      return props.filterDefault(props);
+    },
   },
 });
 

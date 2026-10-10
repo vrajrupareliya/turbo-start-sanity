@@ -12,4 +12,6 @@ export const BLOG_CATEGORY_OPTIONS: BlogCategoryOption[] = [
   { title: "SEO", value: "seo" },
   { title: "AEO", value: "aeo" },
   { title: "Changelog", value: "changelog" },
+  { title: "AI", value: "ai" },
+  { title: "CMS", value: "cms" },
 ];

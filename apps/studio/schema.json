@@ -6708,6 +6708,16 @@
         },
         "optional": true
       },
+      "categories": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "array",
+          "of": {
+            "type": "string"
+          }
+        },
+        "optional": true
+      },
       "category": {
         "type": "objectAttribute",
         "value": {
@@ -6736,6 +6746,14 @@
             {
               "type": "string",
               "value": "changelog"
+            },
+            {
+              "type": "string",
+              "value": "ai"
+            },
+            {
+              "type": "string",
+              "value": "cms"
             }
           ]
         },

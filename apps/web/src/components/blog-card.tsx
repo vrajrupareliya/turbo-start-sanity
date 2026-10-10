@@ -3,7 +3,11 @@ import { SanityImage } from "@workspace/sanity-blocks/internal/sanity-image";
 import { cn } from "@workspace/tailwind-config/utils";
 import Link from "next/link";
 
-import { getBlogCategoryLabel } from "@/lib/blog-categories";
+import {
+  formatBlogSlug,
+  getBlogCategoryLabel,
+  getPostCategories,
+} from "@/lib/blog-categories";
 import type { Blog } from "@/types";
 import { formatDate } from "@/utils";
 
@@ -100,7 +104,7 @@ function BlogCategoryTag({ category }: Readonly<{ category?: string | null }>) {
   }
 
   return (
-    <span className="text-sm text-zinc-700 capitalize dark:text-zinc-300">
+    <span className="font-mono text-xs uppercase tracking-wide text-zinc-700 dark:text-zinc-300">
       {label}
     </span>
   );
@@ -109,30 +113,60 @@ function BlogCategoryTag({ category }: Readonly<{ category?: string | null }>) {
 function BlogMeta({
   publishedAt,
   category,
+  categories,
 }: Readonly<{
   publishedAt: string | null;
   category?: string | null;
+  categories?: (string | null)[] | null;
 }>) {
+  const postCategories = getPostCategories({ category, categories });
+
   return (
-    <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
+    <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5">
       <BlogDate publishedAt={publishedAt} />
-      <BlogCategoryTag category={category} />
+      {postCategories.length > 0 ? (
+        <div className="flex flex-wrap items-center gap-1.5">
+          {postCategories.map((cat) => (
+            <span
+              className="border border-border bg-muted/30 px-1.5 py-0.5 font-mono text-[11px] uppercase tracking-wide text-zinc-700 dark:text-zinc-300"
+              key={cat}
+            >
+              {getBlogCategoryLabel(cat)}
+            </span>
+          ))}
+        </div>
+      ) : (
+        <BlogCategoryTag category={category} />
+      )}
     </div>
   );
 }
 
 export function FeaturedBlogCard({ blog }: BlogCardProps) {
-  const { title, publishedAt, slug, description, image, authors, category } =
-    blog ?? {};
+  const {
+    title,
+    publishedAt,
+    slug,
+    description,
+    image,
+    authors,
+    category,
+    categories,
+  } = blog ?? {};
+  const href = formatBlogSlug(slug);
 
   return (
     <article className="hover-surface group focus-ring-within relative grid grid-cols-1 border border-border lg:grid-cols-2">
       <div className="flex flex-col justify-between gap-10 p-6 sm:p-8">
         <BlockEyebrow eyebrow="Featured" />
         <div className="grid gap-4">
-          <BlogMeta category={category} publishedAt={publishedAt} />
+          <BlogMeta
+            category={category}
+            categories={categories}
+            publishedAt={publishedAt}
+          />
           <h2 className="text-balance font-normal text-3xl leading-tight tracking-tight sm:text-4xl">
-            <Link className="outline-none" href={slug ?? "#"}>
+            <Link className="outline-none" href={href}>
               <span className="absolute inset-0 z-10" />
               {title}
             </Link>
@@ -155,14 +189,27 @@ export function BlogCard({ blog }: BlogCardProps) {
     return null;
   }
 
-  const { title, publishedAt, slug, description, authors, category } = blog;
+  const {
+    title,
+    publishedAt,
+    slug,
+    description,
+    authors,
+    category,
+    categories,
+  } = blog;
+  const href = formatBlogSlug(slug);
 
   return (
     <article className="hover-surface group focus-ring-within relative flex flex-col gap-4 border border-border p-6">
-      <BlogMeta category={category} publishedAt={publishedAt} />
+      <BlogMeta
+        category={category}
+        categories={categories}
+        publishedAt={publishedAt}
+      />
       <div className="flex flex-col gap-3">
         <h3 className="font-normal text-2xl text-zinc-900 leading-8.5 dark:text-zinc-50">
-          <Link className="outline-none" href={slug ?? "#"}>
+          <Link className="outline-none" href={href}>
             <span className="absolute inset-0 z-10" />
             {title}
           </Link>

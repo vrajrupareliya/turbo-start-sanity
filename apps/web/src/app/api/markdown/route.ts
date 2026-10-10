@@ -12,6 +12,11 @@ import {
   querySlugPageData,
 } from "@workspace/sanity/query";
 
+import {
+  BLOG_CATEGORIES,
+  cleanCategoryToken,
+  getPostCategories,
+} from "@/lib/blog-categories";
 import { fetchBlogIndexPage, parseBlogPageParam } from "@/lib/blog-index";
 import {
   blogIndexToMarkdown,
@@ -78,7 +83,33 @@ async function fetchRedirects() {
 type BlogIndexQuery = {
   page: string | null;
   category: string | null;
+  categories: string | null;
 };
+
+function resolveMarkdownFilterCategories(
+  query: BlogIndexQuery,
+  blogs: Parameters<typeof getPostCategories>[0][]
+): string[] {
+  const rawCats = query.categories || query.category;
+  if (!rawCats) return [];
+
+  const rawTokens = rawCats.split(",").map(cleanCategoryToken).filter(Boolean);
+
+  const validSet = new Set<string>();
+  for (const c of BLOG_CATEGORIES) {
+    const cleaned = cleanCategoryToken(c.value);
+    if (cleaned) validSet.add(cleaned);
+  }
+  for (const b of blogs) {
+    for (const cat of getPostCategories(b)) {
+      const cleaned = cleanCategoryToken(cat);
+      if (cleaned) validSet.add(cleaned);
+    }
+  }
+
+  const validTokens = rawTokens.filter((t) => validSet.has(t));
+  return validTokens.length > 0 ? Array.from(new Set(validTokens)) : [];
+}
 
 /**
  * One page of the blog index, matching what `/blog?page=…&category=…` renders,
@@ -96,16 +127,22 @@ async function buildBlogIndexPageMarkdown(
   }
 
   const data = await fetchBlogIndexPage({
-    currentPage,
-    category: query.category ?? "",
     ...options,
   });
   if (!data) {
     return null;
   }
 
+  const selectedCats = resolveMarkdownFilterCategories(query, data.blogs ?? []);
+
+  const filteredBlogs = (data.blogs ?? []).filter((blog) => {
+    if (selectedCats.length === 0) return true;
+    const blogCats = getPostCategories(blog);
+    return selectedCats.every((sc) => blogCats.includes(sc));
+  });
+
   const { totalPages } = calculateBlogPaginationMetadata(
-    data.total,
+    filteredBlogs.length,
     currentPage
   );
   // Past the last page is a dead URL, not an empty document. `totalPages`
@@ -114,10 +151,14 @@ async function buildBlogIndexPageMarkdown(
     return null;
   }
 
-  const featured = currentPage === 1 ? data.featuredBlogs : [];
+  const start = Math.max(currentPage - 1, 0) * 9;
+  const pagedBlogs = filteredBlogs.slice(start, start + 9);
+  const featured =
+    currentPage === 1 && selectedCats.length === 0 ? data.featuredBlogs : [];
+
   return blogIndexToMarkdown(data as MarkdownDocument, [
     ...(featured as MarkdownBlogListItem[]),
-    ...(data.blogs as MarkdownBlogListItem[]),
+    ...(pagedBlogs as MarkdownBlogListItem[]),
   ]);
 }
 
@@ -127,7 +168,11 @@ async function buildBlogIndexMarkdown(
 ): Promise<string | null> {
   // Bare `/blog.md` is the whole corpus in one document, so LLM consumers get
   // every post in a single fetch; `page`/`category` request a slice instead.
-  if (query.page !== null || query.category !== null) {
+  if (
+    query.page !== null ||
+    query.category !== null ||
+    query.categories !== null
+  ) {
     return buildBlogIndexPageMarkdown(query, options);
   }
 
@@ -215,7 +260,9 @@ function representationOf(path: string, query: BlogIndexQuery): string {
   if (query.page !== null) {
     params.set("page", query.page);
   }
-  if (query.category !== null) {
+  if (query.categories !== null) {
+    params.set("categories", query.categories);
+  } else if (query.category !== null) {
     params.set("category", query.category);
   }
   const search = params.toString();
@@ -230,6 +277,7 @@ export async function GET(request: Request): Promise<Response> {
   const query: BlogIndexQuery = {
     page: readForwarded(request, url, "page"),
     category: readForwarded(request, url, "category"),
+    categories: readForwarded(request, url, "categories"),
   };
 
   const options = await resolveFetchOptions();
