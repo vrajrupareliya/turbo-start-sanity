@@ -73,6 +73,7 @@ export function BlogPageContent({
         <BlogHeader description={description} title={title} />
 
         <BlogSearchLayout
+          initialCategories={selectedCategories}
           categoryFilter={
             <BlogCategoryFilter
               availableOptions={availableOptions}

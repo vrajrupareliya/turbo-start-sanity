@@ -43,6 +43,10 @@ const env = createEnv({
     NEXT_PUBLIC_SANITY_DATASET: z.string().min(1),
     NEXT_PUBLIC_SANITY_API_VERSION: z.string().min(1).optional(),
     NEXT_PUBLIC_SANITY_STUDIO_URL: z.url().min(1),
+
+    NEXT_PUBLIC_ALGOLIA_APP_ID: z.string().min(1).optional(),
+    NEXT_PUBLIC_ALGOLIA_SEARCH_API_KEY: z.string().min(1).optional(),
+    NEXT_PUBLIC_ALGOLIA_INDEX_NAME: z.string().min(1).optional(),
   },
 
   experimental__runtimeEnv: {
@@ -58,6 +62,14 @@ const env = createEnv({
     NEXT_PUBLIC_SANITY_STUDIO_URL: process.env.NEXT_PUBLIC_SANITY_STUDIO_URL,
     NEXT_PUBLIC_SANITY_PROJECT_ID: process.env.NEXT_PUBLIC_SANITY_PROJECT_ID,
     NEXT_PUBLIC_SANITY_DATASET: process.env.NEXT_PUBLIC_SANITY_DATASET,
+
+    NEXT_PUBLIC_ALGOLIA_APP_ID:
+      process.env.NEXT_PUBLIC_ALGOLIA_APP_ID || process.env.ALGOLIA_APP_ID,
+    NEXT_PUBLIC_ALGOLIA_SEARCH_API_KEY:
+      process.env.NEXT_PUBLIC_ALGOLIA_SEARCH_API_KEY,
+    NEXT_PUBLIC_ALGOLIA_INDEX_NAME:
+      process.env.NEXT_PUBLIC_ALGOLIA_INDEX_NAME ||
+      process.env.ALGOLIA_INDEX_NAME,
   },
 
   // Treat empty env strings as unset so `.optional()` vars accept a blank value.

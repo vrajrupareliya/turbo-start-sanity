@@ -93,6 +93,7 @@
       "includes": [
         "**/scripts/**/*.ts",
         "**/scripts/**/*.js",
+        "**/scripts/**/*.mjs",
         "packages/logger/**/*.ts"
       ],
       "linter": {

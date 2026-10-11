@@ -10,6 +10,7 @@ import {
   NavigationMenuList,
   NavigationMenuTrigger,
 } from "@workspace/ui/components/navigation-menu";
+import { Search } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useRef } from "react";
@@ -17,6 +18,7 @@ import { useEffect, useRef } from "react";
 import { GithubStars } from "@/components/github-stars";
 import { Logo } from "@/components/logo";
 import { MobileMenu } from "@/components/mobile-menu";
+import { useSearchModal } from "@/components/search-modal-context";
 import type { ColumnLink, NavigationData } from "@/types";
 
 // Focus-visible mirrors the `hover-surface` wash so keyboard and pointer land
@@ -205,6 +207,9 @@ export function Navbar({
   const { columns, buttons, gitHubUrl } = navbarData || {};
   const { siteTitle, logos } = settingsData || {};
   const headerRef = useRef<HTMLElement>(null);
+  const searchTriggerRef = useRef<HTMLButtonElement>(null);
+  const mobileSearchTriggerRef = useRef<HTMLButtonElement>(null);
+  const { openSearch } = useSearchModal();
   useNavContrast(headerRef);
   // Nothing in the bar marks where you are: the active item is styled no
   // differently from the rest, so `aria-current` is the only signal a screen
@@ -299,6 +304,22 @@ export function Navbar({
             className="group hidden flex-1 items-center justify-end gap-2 lg:flex"
             data-nav-adaptive=""
           >
+            <button
+              aria-label="Search articles (Cmd+K)"
+              className={cn(
+                NAV_LINK_CLASS,
+                "flex items-center gap-2 border border-border/70 px-2.5 py-1.5 text-xs text-muted-foreground hover:text-foreground"
+              )}
+              onClick={() => openSearch(searchTriggerRef.current)}
+              ref={searchTriggerRef}
+              type="button"
+            >
+              <Search className="size-3.5" />
+              <span className="hidden xl:inline">Search</span>
+              <kbd className="hidden items-center border border-border/80 bg-muted/40 px-1 py-0.2 font-mono text-[9px] text-muted-foreground sm:inline-flex">
+                ⌘K
+              </kbd>
+            </button>
             <GithubStars gitHubUrl={gitHubUrl} stars={stars} />
             <SanityButtons
               buttonClassName={NAV_BUTTON_CLASS}
@@ -309,6 +330,18 @@ export function Navbar({
           </div>
 
           <div className="flex flex-1 items-center justify-end gap-2 lg:hidden">
+            <button
+              aria-label="Search articles"
+              className={cn(
+                NAV_LINK_CLASS,
+                "flex size-9 items-center justify-center p-0"
+              )}
+              onClick={() => openSearch(mobileSearchTriggerRef.current)}
+              ref={mobileSearchTriggerRef}
+              type="button"
+            >
+              <Search className="size-4" />
+            </button>
             <GithubStars
               className="-mr-2"
               gitHubUrl={gitHubUrl}
