@@ -8,6 +8,7 @@ import {
   getBlogCategoryLabel,
   getPostCategories,
 } from "@/lib/blog-categories";
+import { PokemonArtwork } from "@/components/pokemon-artwork";
 import type { Blog } from "@/types";
 import { formatDate } from "@/utils";
 
@@ -149,6 +150,7 @@ export function FeaturedBlogCard({ blog }: BlogCardProps) {
     slug,
     description,
     image,
+    pokemon,
     authors,
     category,
     categories,
@@ -178,7 +180,15 @@ export function FeaturedBlogCard({ blog }: BlogCardProps) {
         </div>
       </div>
       <div className="relative order-first min-h-60 overflow-hidden border-border border-b lg:order-last lg:min-h-full lg:border-b-0 lg:border-s">
-        <BlogImage image={image} title={title} />
+        {pokemon?.id && pokemon?.name ? (
+          <PokemonArtwork
+            id={pokemon.id}
+            name={pokemon.name}
+            priority
+          />
+        ) : (
+          <BlogImage image={image} title={title} />
+        )}
       </div>
     </article>
   );
@@ -197,30 +207,49 @@ export function BlogCard({ blog }: BlogCardProps) {
     authors,
     category,
     categories,
+    pokemon,
+    image,
   } = blog;
   const href = formatBlogSlug(slug);
 
   return (
-    <article className="hover-surface group focus-ring-within relative flex flex-col gap-4 border border-border p-6">
-      <BlogMeta
-        category={category}
-        categories={categories}
-        publishedAt={publishedAt}
-      />
-      <div className="flex flex-col gap-3">
-        <h3 className="font-normal text-2xl text-zinc-900 leading-8.5 dark:text-zinc-50">
-          <Link className="outline-none" href={href}>
-            <span className="absolute inset-0 z-10" />
-            {title}
-          </Link>
-        </h3>
-        {description ? (
-          <p className="body-text line-clamp-3 text-muted-foreground">
-            {description}
-          </p>
-        ) : null}
+    <article className="hover-surface group focus-ring-within relative flex flex-col border border-border">
+      {/* Hero visual: Pokemon artwork with fallback to Sanity image */}
+      <div className="relative aspect-[4/3] w-full overflow-hidden border-b border-border bg-muted/20">
+        {pokemon?.id && pokemon?.name ? (
+          <PokemonArtwork
+            id={pokemon.id}
+            name={pokemon.name}
+            sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
+          />
+        ) : image?.id ? (
+          <BlogImage image={image} title={title} />
+        ) : (
+          <div className="size-full bg-muted/20" />
+        )}
       </div>
-      <BlogAuthor author={authors} className="mt-auto" />
+
+      <div className="flex flex-1 flex-col gap-4 p-6">
+        <BlogMeta
+          category={category}
+          categories={categories}
+          publishedAt={publishedAt}
+        />
+        <div className="flex flex-col gap-3">
+          <h3 className="font-normal text-2xl text-zinc-900 leading-8.5 dark:text-zinc-50">
+            <Link className="outline-none" href={href}>
+              <span className="absolute inset-0 z-10" />
+              {title}
+            </Link>
+          </h3>
+          {description ? (
+            <p className="body-text line-clamp-3 text-muted-foreground">
+              {description}
+            </p>
+          ) : null}
+        </div>
+        <BlogAuthor author={authors} className="mt-auto" />
+      </div>
     </article>
   );
 }

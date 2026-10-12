@@ -105,6 +105,7 @@ const blogCardFragment = /* groq */ `
   category,
   "categories": array::compact(coalesce(categories, select(defined(category) => [category], []))),
   ${imageFragment},
+  pokemon,
   publishedAt,
   ${blogAuthorFragment}
 `;
@@ -218,6 +219,7 @@ export const queryBlogSlugPageData = defineQuery(`
     "slug": slug.current,
     ogTitle,
     "ogImage": seoImage.asset->url + "?w=1200&h=630&fit=crop&fm=jpg&q=80",
+    pokemon,
     ${blogAuthorFragment},
     ${imageFragment},
     ${richTextFragment},

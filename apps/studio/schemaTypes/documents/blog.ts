@@ -137,6 +137,14 @@ export const blog = defineType({
       validation: (Rule) => Rule.required(),
     }),
     defineField({
+      name: "pokemon",
+      type: "pokemon",
+      title: "Pokémon",
+      description:
+        "Associate a unique Pokémon with this blog post (searched and fetched via PokéAPI)",
+      group: GROUP.MAIN_CONTENT,
+    }),
+    defineField({
       name: "richText",
       type: "richText",
       description:

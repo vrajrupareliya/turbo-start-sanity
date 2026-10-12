@@ -24,6 +24,7 @@ import {
   TableOfContent,
 } from "@/components/elements/table-of-content";
 import { ArticleJsonLd } from "@/components/json-ld";
+import { PokemonArtwork } from "@/components/pokemon-artwork";
 import { seoFromDocument } from "@/lib/seo";
 import { formatDate, getBaseUrl, PLACEHOLDER_SLUG } from "@/utils";
 
@@ -149,7 +150,15 @@ async function getDraftBlogPage({
 }
 
 function BlogPageContent({ data }: Readonly<{ data: BlogPageData }>) {
-  const { title, richText, publishedAt, _updatedAt } = data ?? {};
+  const {
+    title,
+    description,
+    richText,
+    publishedAt,
+    _updatedAt,
+    pokemon,
+    image,
+  } = data ?? {};
   const author = data?.authors;
   const publishedDate = formatDate(publishedAt);
   const updatedDate = formatDate(_updatedAt);
@@ -166,46 +175,77 @@ function BlogPageContent({ data }: Readonly<{ data: BlogPageData }>) {
         ]}
       />
       <div className="container flex flex-col gap-16 pt-12 pb-24 md:gap-24 md:pt-16">
-        <header className="flex flex-col gap-6">
-          <h1 className="text-balance font-normal text-4xl tracking-tight sm:text-5xl lg:text-6xl lg:leading-[1.1]">
-            {title}
-          </h1>
+        <header className="grid grid-cols-1 items-stretch gap-10 lg:grid-cols-2 lg:gap-16">
+          <div className="flex flex-col justify-center gap-6">
+            <h1 className="text-balance font-normal text-4xl tracking-tight sm:text-5xl lg:text-6xl lg:leading-[1.1]">
+              {title}
+            </h1>
 
-          <div className="flex flex-col gap-4">
-            <dl className="flex flex-col text-sm">
-              {publishedDate && (
-                <div className="flex gap-1.5">
-                  <dt className="text-muted-foreground">Published At:</dt>
-                  <dd className="text-foreground/90">{publishedDate}</dd>
-                </div>
-              )}
-              {updatedDate && (
-                <div className="flex gap-1.5">
-                  <dt className="text-muted-foreground">Last Updated At:</dt>
-                  <dd className="text-foreground/90">{updatedDate}</dd>
-                </div>
-              )}
-            </dl>
+            {description ? (
+              <p className="body-text text-lg leading-relaxed text-muted-foreground">
+                {description}
+              </p>
+            ) : null}
 
-            {author?.name && (
-              <div className="flex items-center gap-2">
-                {author.image?.id && (
-                  <span className="inline-block size-6 overflow-hidden rounded-full">
-                    <SanityImage
-                      alt={author.name}
-                      className="size-6 rounded-full object-cover"
-                      height={24}
-                      image={author.image}
-                      sizes="24px"
-                      width={24}
-                    />
-                  </span>
+            <div className="mt-2 flex flex-col gap-4">
+              <dl className="flex flex-col gap-1 font-mono text-xs uppercase tracking-wider text-muted-foreground">
+                {publishedDate && (
+                  <div className="flex gap-2">
+                    <dt>PUBLISHED:</dt>
+                    <dd className="text-foreground/90">{publishedDate}</dd>
+                  </div>
                 )}
-                <span className="text-muted-foreground text-sm">
-                  {author.name}
-                </span>
-              </div>
-            )}
+                {updatedDate && (
+                  <div className="flex gap-2">
+                    <dt>LAST UPDATED:</dt>
+                    <dd className="text-foreground/90">{updatedDate}</dd>
+                  </div>
+                )}
+              </dl>
+
+              {author?.name && (
+                <div className="mt-2 flex items-center gap-2">
+                  {author.image?.id && (
+                    <span className="inline-block size-6 overflow-hidden rounded-full">
+                      <SanityImage
+                        alt={author.name}
+                        className="size-6 rounded-full object-cover"
+                        height={24}
+                        image={author.image}
+                        sizes="24px"
+                        width={24}
+                      />
+                    </span>
+                  )}
+                  <span className="text-sm font-medium text-muted-foreground">
+                    {author.name}
+                  </span>
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Hero Visual: Pokémon artwork with fallback to Sanity image */}
+          <div className="relative aspect-[4/3] min-h-[300px] w-full overflow-hidden border border-border bg-muted/20 lg:aspect-square">
+            {pokemon?.id && pokemon?.name ? (
+              <PokemonArtwork
+                id={pokemon.id}
+                name={pokemon.name}
+                priority
+                sizes="(min-width: 1024px) 50vw, 100vw"
+              />
+            ) : image?.id ? (
+              <SanityImage
+                alt={title ?? "Blog post"}
+                className="size-full object-cover"
+                fetchPriority="high"
+                height={600}
+                image={image}
+                loading="eager"
+                sizes="(min-width: 1024px) 50vw, 100vw"
+                width={800}
+              />
+            ) : null}
           </div>
         </header>
 
