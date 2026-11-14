@@ -36,7 +36,7 @@ export type Link = {
   url?: CustomUrl;
 };
 
-export type Testimonial = {
+export type SubscribeNewsletterTestimonial = {
   eyebrow?: string;
   quote?: Array<{
     children?: Array<{
@@ -278,7 +278,7 @@ export type SubscribeNewsletter = {
     _type: "block";
     _key: string;
   }>;
-  testimonial?: Testimonial;
+  testimonial?: SubscribeNewsletterTestimonial;
 };
 
 export type RichTextBlock = {
@@ -902,6 +902,17 @@ export type HomePage = {
   ogDescription?: string;
 };
 
+export type Testimonial = {
+  _id: string;
+  _type: "testimonial";
+  _createdAt: string;
+  _updatedAt: string;
+  _rev: string;
+  name: string;
+  quote: string;
+  author?: string;
+};
+
 export type Author = {
   _id: string;
   _type: "author";
@@ -1014,7 +1025,14 @@ export type Blog = {
   featured?: boolean;
   categories?: Array<string>;
   category?:
-    "sanity" | "skills" | "nextjs" | "seo" | "aeo" | "changelog" | "ai" | "cms";
+    | "sanity"
+    | "skills"
+    | "nextjs"
+    | "seo"
+    | "aeo"
+    | "changelog"
+    | "ai"
+    | "cms";
   image: {
     asset?: SanityImageAssetReference;
     media?: unknown;
@@ -1396,7 +1414,7 @@ export type AllSanitySchemaTypes =
   | Video
   | UsedByTeams
   | Link
-  | Testimonial
+  | SubscribeNewsletterTestimonial
   | VideoFeatureVideo
   | SanityImageAssetReference
   | SeoImage
@@ -1446,6 +1464,7 @@ export type AllSanitySchemaTypes =
   | Settings
   | BlogIndex
   | HomePage
+  | Testimonial
   | Author
   | Faq
   | Page
@@ -3832,7 +3851,14 @@ export type QueryBlogSlugPageDataResult = {
   featured?: boolean;
   categories?: Array<string>;
   category?:
-    "aeo" | "ai" | "changelog" | "cms" | "nextjs" | "sanity" | "seo" | "skills";
+    | "aeo"
+    | "ai"
+    | "changelog"
+    | "cms"
+    | "nextjs"
+    | "sanity"
+    | "seo"
+    | "skills";
   image: {
     id: string | null;
     preview: string | null;

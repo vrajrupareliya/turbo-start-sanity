@@ -119,7 +119,7 @@
   },
   {
     "type": "type",
-    "name": "testimonial",
+    "name": "subscribeNewsletter.testimonial",
     "value": {
       "type": "object",
       "attributes": {
@@ -1825,7 +1825,7 @@
           "type": "objectAttribute",
           "value": {
             "type": "inline",
-            "name": "testimonial"
+            "name": "subscribeNewsletter.testimonial"
           },
           "optional": true
         }
@@ -6043,6 +6043,64 @@
         "optional": true
       },
       "ogDescription": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "string"
+        },
+        "optional": true
+      }
+    }
+  },
+  {
+    "name": "testimonial",
+    "type": "document",
+    "attributes": {
+      "_id": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "string"
+        }
+      },
+      "_type": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "string",
+          "value": "testimonial"
+        }
+      },
+      "_createdAt": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "string"
+        }
+      },
+      "_updatedAt": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "string"
+        }
+      },
+      "_rev": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "string"
+        }
+      },
+      "name": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "string"
+        },
+        "optional": false
+      },
+      "quote": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "string"
+        },
+        "optional": false
+      },
+      "author": {
         "type": "objectAttribute",
         "value": {
           "type": "string"
